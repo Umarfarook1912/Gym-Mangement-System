@@ -1,0 +1,96 @@
+---
+description: Core principles, stack, project structure and development workflow for the Gym Management System
+alwaysApply: true
+---
+
+# Gym Management System — Core Rules
+
+Production-quality Gym Management System for a single gym with multiple admin accounts.
+Two user roles: **Admin** and **Member**.
+
+## Technology stack (do not introduce alternatives)
+
+- Frontend: Vite + React (JavaScript, not TypeScript) + Tailwind CSS. Hosted on Vercel.
+- Backend: Node.js + Express.js. Hosted on Vercel.
+- Database: MongoDB with Mongoose.
+- Auth: JWT. Passwords hashed with bcrypt.
+- Email: Nodemailer over SMTP.
+
+## Root structure — frontend and backend are completely separated
+
+```
+gym-management-system/
+├── frontend/   (src/, public/, package.json)
+├── backend/    (src/, package.json)
+├── README.md
+└── .gitignore
+```
+
+Never mix frontend and backend files. Never create random files/folders without a clear architectural reason.
+
+## Most important rule: SEARCH → UNDERSTAND → REUSE → EXTEND → CREATE ONLY IF NECESSARY
+
+Before creating any function, component, hook, utility, service, validation, modal, table, form or helper:
+
+1. Search the existing codebase for similar functionality.
+2. If it exists, reuse it. If it partially exists, refactor/extend it carefully.
+3. Only create new code when nothing suitable exists, and place it in the correct architectural layer.
+
+"Write once, reuse everywhere." Never create per-page copies of the same component
+(e.g. `AdminMemberButton.jsx`, `AdminPlanButton.jsx` → WRONG; one `Button.jsx` configured via props → RIGHT).
+
+## Constants — no magic numbers or strings
+
+Store repeated values in `frontend/src/constants/` and `backend/src/constants/`:
+user roles, membership/attendance statuses, API endpoints, route names, error/success messages,
+validation limits, plan types, date formats, pagination defaults, toast durations, email subjects, status labels.
+
+```js
+// ❌ if (role === "admin")        if (members.length > 10)        setTimeout(cb, 5000)
+// ✅ if (role === USER_ROLES.ADMIN)   MAX_MEMBERS_PER_PAGE            TOAST_DURATION
+```
+
+If a value may change in the future, it must be a constant or configurable.
+
+## Environment variables
+
+Never hardcode secrets or environment-specific values (`MONGODB_URI`, `JWT_SECRET`, `SMTP_HOST`, `SMTP_PORT`,
+`SMTP_USER`, `SMTP_PASSWORD`, `FRONTEND_URL`). Use `.env` files, provide `.env.example` with placeholders,
+never commit `.env`, never expose backend env vars in frontend code.
+
+## Code quality
+
+- Meaningful names, small single-responsibility functions, clear separation of concerns, consistent formatting.
+- No huge components/controllers, duplicate code, unused imports, dead code, commented-out old code,
+  temporary hacks, or stray `console.log` in production code. Use a centralized logging utility; never log
+  passwords, JWT secrets, SMTP passwords or sensitive personal data.
+- Do not over-engineer: no unnecessary abstractions, libraries, wrappers, global state or hooks.
+  Use the simplest maintainable solution. Do not add a state-management library; React state/context suffices.
+- Dates: use one centralized date utility per side; keep timezone handling consistent across frontend,
+  backend, database and email.
+
+## Development workflow for every feature
+
+1. Understand requirement → inspect structure → search for reusable code.
+2. Identify backend changes, frontend changes, constants, validation.
+3. Implement backend: Route → Middleware → Controller → Service → Model.
+4. Implement frontend with reusable components, connect API, handle loading/empty/error states.
+5. Test, check responsiveness, check authorization/security, remove duplication, update README if needed.
+
+## Git
+
+Meaningful commits (`feat: add member management`, `fix: prevent duplicate attendance`, `refactor: extract reusable modal`).
+Never commit `.env`, `node_modules`, build output, temp/debug files, credentials.
+Any throwaway verification scripts go outside the repo (e.g. `/tmp`).
+
+## README must document
+
+Overview, features, stack, folder structure, installation, env vars, dev/build commands, deployment,
+API overview, authentication, database setup. Update when architecture changes significantly.
+
+## Final quality check before marking a feature complete
+
+No duplicate code · existing code reused · constants centralized · frontend/backend separated ·
+Model → Controller → Routes followed · business logic in services · auth + authorization correct ·
+validation + error handling present · loading/empty/error states · responsive · luxury theme respected ·
+no secrets committed · no stray console logs · consistent API response format · no unnecessary dependencies.

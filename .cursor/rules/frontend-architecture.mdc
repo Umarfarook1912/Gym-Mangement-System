@@ -1,0 +1,88 @@
+---
+description: Frontend structure, reusable components, hooks, services, routing and state handling rules for the React frontend
+globs: frontend/**
+alwaysApply: false
+---
+
+# Frontend Architecture
+
+## Structure
+
+```
+frontend/src/
+├── assets/
+├── components/
+│   ├── common/   Button, Input, Select, SearchInput, Badge, StatusBadge, Loader, Toast, Pagination, Dropdown,
+│   │             LoadingState, EmptyState, ErrorState, PageHeader, Breadcrumb, DatePicker, FormField
+│   ├── layout/   Sidebar, Navbar
+│   ├── forms/
+│   ├── tables/   DataTable
+│   ├── modals/   Modal, ConfirmationModal
+│   ├── cards/    Card, StatCard, ChartCard
+│   └── charts/
+├── pages/        auth/, admin/, member/
+├── layouts/
+├── routes/       ProtectedRoute, route definitions
+├── services/     apiClient.js, authService.js, memberService.js, membershipService.js,
+│                 attendanceService.js, reportService.js, announcementService.js
+├── hooks/        useAuth, useFetch, usePagination, useDebounce, useModal, useForm, useAttendance
+├── context/
+├── utils/        centralized date utility, formatters
+├── constants/
+├── config/
+├── validations/
+├── App.jsx
+└── main.jsx
+```
+
+## Reusable components — one implementation, configured via props
+
+Never create page-specific copies of Button, Modal, Table, Form, etc.
+- **DataTable**: one system supporting columns, sorting, search, filtering, pagination, actions, empty/loading
+  states and responsive behavior. Separate table implementations only when requirements genuinely differ.
+- **Modals**: one reusable modal system with configurable content (Add/Edit Member, Delete Confirmation,
+  Add/Edit Plan, Announcement).
+- **States**: every API-driven page handles Loading, Success, Empty and Error using the shared
+  `LoadingState`, `EmptyState`, `ErrorState` components — no custom per-page loading screens.
+- **Notifications**: one centralized toast system; messages come from constants.
+- **Dashboard**: built from `StatCard`, `ChartCard`, `ActivityList`, `DataTable`.
+
+## Forms
+
+Validate with shared validation schemas in `validations/`; show clear errors; prevent invalid submissions;
+show loading state while submitting; disable duplicate submission; show success/error feedback; reset correctly.
+Reuse common form components — never duplicate the member/plan/announcement forms.
+
+## API layer
+
+All HTTP calls go through `services/apiClient.js` (shared base URL, auth header, error normalization).
+Feature services wrap endpoints from `constants/`. Never repeat fetch/axios configuration in components.
+Only create a service when needed.
+
+## Hooks & state
+
+Check for an existing hook before creating one. Keep UI state, auth state, server data and form state separate.
+Prefer local state; use context only for truly shared state (e.g. auth). No state-management library.
+Use `useMemo`/`useCallback` only with a real reason.
+
+## Search & pagination
+
+Search is reusable (`SearchInput` + `useDebounce`), avoids unnecessary requests, and shows a clear empty state.
+Pagination is reusable and reads defaults from constants — never hardcode page sizes in pages.
+
+## Routing
+
+Protected routes with role-based redirects. Unauthorized users are redirected appropriately.
+
+```
+/login
+/admin/dashboard  /admin/members  /admin/payments  /admin/membership-plans  /admin/attendance
+/admin/reports    /admin/announcements  /admin/settings  /admin/profile
+/member/dashboard /member/profile /member/membership /member/attendance /member/announcements
+```
+
+Route paths are constants. Frontend protection is a UX layer only — the backend enforces authorization.
+
+## Performance
+
+Pagination, debounced search, lazy loading where appropriate, avoid unnecessary API calls.

@@ -1,0 +1,81 @@
+---
+description: Backend architecture, layering, API format, error handling and security rules for the Express/MongoDB backend
+globs: backend/**
+alwaysApply: false
+---
+
+# Backend Architecture
+
+## Structure
+
+```
+backend/src/
+├── config/        DB, environment and app configuration
+├── constants/     application-wide constants
+├── models/        Mongoose schemas only — fields, validation, indexes, DB-specific behavior
+├── controllers/   thin request/response handling
+├── routes/        HTTP method + endpoint + middleware + controller mapping only
+├── middleware/    authenticate, authorize, validate, error handler, request processing
+├── services/      business logic (membership, attendance, email, report calculations)
+├── utils/         generic helpers
+├── validations/   request validation schemas
+├── templates/     reusable email templates
+├── helpers/
+├── app.js
+└── server.js
+```
+
+## Request flow — always
+
+Route → Middleware → Controller → Service → Model → Database
+
+```js
+// routes: definition only, no logic
+router.get("/members", authenticate, authorize(USER_ROLES.ADMIN), memberController.getMembers);
+```
+
+- **Controllers**: receive request → obtain/validate data → call service → return response → handle expected errors. No large workflows.
+- **Services**: all business logic. Attendance calculations, membership expiry logic, report filtering and
+  email sending live here and are never duplicated across controllers.
+- **Models**: schema + validation + indexes. No application logic.
+- **Routes**: never contain business logic.
+
+## API response format — identical across every endpoint
+
+```json
+{ "success": true,  "message": "Member fetched successfully", "data": {} }
+{ "success": false, "message": "Unable to fetch member",      "error": {} }
+```
+
+## Error handling
+
+Centralized error middleware. Correct status codes: 400 Bad Request, 401 Unauthorized, 403 Forbidden,
+404 Not Found, 409 Conflict, 422 Validation Error, 500 Internal Server Error.
+Log useful server-side errors via the logging utility; never leak internals to clients.
+
+## Authentication & authorization (enforced on the backend, never only on the frontend)
+
+- JWT auth with roles `USER_ROLES.ADMIN` / `USER_ROLES.MEMBER`. bcrypt password hashing — never plain text.
+- Implement login, logout, protected routes, role-based authorization, forgot/reset/change password, token validation.
+- Admin-only endpoints: members, plans, attendance management, announcements, gym settings, reports, admin management.
+- Members may only read their own profile, membership and attendance. Never allow access to another member's data.
+
+## Security checklist for every endpoint
+
+Authentication · authorization · request validation (validations/ + middleware) · input sanitization ·
+CORS configuration · rate limiting where appropriate · secure HTTP headers · no error leakage ·
+never expose JWT secret, SMTP password, MongoDB credentials or API keys.
+
+## Database
+
+Collections: `Admin`, `Member`, `MembershipPlan`, `MembershipPayment`, `Attendance`, `Announcement`, `GymSettings`.
+Use references between collections. Index frequently searched fields (email, member ID, attendance date,
+membership status). Paginate large datasets. Avoid unnecessary queries. Schema validation is mandatory;
+request validation and frontend validation are additional layers, not replacements.
+
+## Email
+
+One reusable `services/email.service.js` with a single Nodemailer transport configured from env vars.
+Templates live in `templates/`; never embed large HTML strings or create Nodemailer configs in controllers.
+Supported emails: new member registration, membership expiry reminder on the end date, announcement,
+and password reset. Email subjects are constants.

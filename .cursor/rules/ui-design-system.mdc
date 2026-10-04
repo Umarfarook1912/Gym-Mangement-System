@@ -1,0 +1,40 @@
+---
+description: Luxury dark/gold design system, color palette, Tailwind and responsive rules for all UI files
+globs: frontend/src/**/*.jsx,frontend/src/**/*.css,frontend/tailwind.config.*,frontend/index.html
+alwaysApply: false
+---
+
+# UI Design System — Luxury, Premium, Powerful
+
+High-end gym / fitness-studio aesthetic. Modern, professional, dark theme with gold accents.
+
+## Palette — define once in the Tailwind theme, never use raw hex in components
+
+| Token      | Hex       | Use for |
+|------------|-----------|---------|
+| background | `#0B0B0B` | main background, sidebar, dashboard background, dark sections |
+| primary    | `#F5B800` | primary buttons, active states, highlights, icons, progress indicators, key stats, accent borders |
+| secondary  | `#FFFFFF` | headings, important content, primary readable text, cards where appropriate |
+| text       | `#A1A1A1` | secondary text, descriptions, labels, metadata |
+
+Do not introduce random colors. Semantic states (success / warning / error) are defined centrally in the
+Tailwind theme/constants and reused — never inline hex values.
+
+## Design rules
+
+Use: clean spacing, strong typography, rounded-but-professional cards, subtle borders, clear hierarchy,
+consistent shadows, consistent spacing, responsive layouts.
+
+The UI must NOT look cluttered, over-designed, cartoonish, cheap, generic or inconsistent.
+Avoid excessive gradients, excessive animations and decorative elements with no purpose.
+
+## Tailwind
+
+- Use Tailwind utilities consistently; no ad-hoc inline styles unless genuinely necessary.
+- A repeated style pattern becomes a reusable component (or a centralized class), not copy-pasted utility strings.
+- Keep padding, margin, font sizes, border radius, shadows, colors and breakpoints consistent across the app.
+
+## Responsive
+
+Support desktop, laptop, tablet and mobile. The admin dashboard must work on small screens.
+Tables need proper responsive behavior; never allow unnecessary horizontal overflow.

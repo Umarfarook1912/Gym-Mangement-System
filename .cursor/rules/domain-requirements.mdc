@@ -1,0 +1,63 @@
+---
+description: Business domain requirements — members, membership plans, attendance, dashboard, announcements, reports and emails
+alwaysApply: true
+---
+
+# Domain Requirements
+
+## Roles
+
+- **Admin** (multiple accounts supported): dashboard, profile, edit profile, change/forgot/reset password,
+  manage members, membership plans, memberships, attendance, announcements, gym timings/settings, reports, admins.
+- **Member**: own login; view own profile, membership details/status, attendance, announcements.
+
+## Member fields
+
+Member ID, Full Name, Email, Phone Number, Date of Birth, Gender, Address, Join Date, Membership Plan,
+Membership Start Date, Membership End Date, Emergency Contact, Height, Weight, Status.
+Admin operations: add, edit, view, delete, search, filter, view membership, view attendance.
+
+## Membership plans (defaults live in constants/config or DB seed — never inside components)
+
+| Plan        | Duration  | Price   |
+|-------------|-----------|---------|
+| Monthly     | 1 month   | ₹1,000  |
+| Quarterly   | 3 months  | ₹2,500  |
+| Half-Yearly | 6 months  | ₹5,000  |
+| Yearly      | 12 months | ₹10,000 |
+
+Plan fields: Plan Name, Duration, Price, Status. Admin manages plans.
+Memberships have start date, end date, `MEMBERSHIP_STATUS` (active / expired / inactive) and expiry reminders.
+Each member has a payment history. Registration records the first period as paid. When that period ends, an admin marks the next period paid and may choose a different plan. The member's current plan follows the period that covers today. Members can view every previous payment.
+Registered members and payments are separate admin sections. The payments section has active and expired tabs. Marking a period paid updates that list and the member's own payment history.
+
+## Attendance (all logic in `attendance.service.js`, never duplicated across controllers)
+
+Supports check-in, check-out, date, check-in/out times, history, today's attendance, monthly attendance,
+member-wise attendance, calendar view, attendance percentage, present/absent status.
+
+Rules:
+1. A member cannot check in more than once per day — duplicate check-in is rejected. Members mark their own check-in and check-out for today. An admin can mark today live, and can record a previous day by entering the start and end time.
+2. Check-out is mandatory according to the configured gym attendance workflow (from GymSettings).
+3. Calculations are consistent and centralized in the backend service.
+
+## Dashboard
+
+StatCards: Total Members, Active Members, Expired Members, Today's Attendance, Present Members,
+Absent Members, Expiring Memberships. Plus attendance chart, membership statistics, recent registrations,
+recent activities, membership expiry info.
+
+## Announcements / gym updates
+
+Admin manages gym timing, maintenance announcements and important announcements (create/edit/delete).
+Members can only view. Announcements support email notification.
+
+## Reports (shared filtering in a reusable report service/utility — no per-report duplication)
+
+Daily / weekly / monthly attendance, member-wise attendance, present/absent, attendance percentage,
+date-range report. Export to PDF and Excel/CSV, plus print.
+
+## Emails (via the single email service + templates)
+
+1. New member registration · 2. Membership expiry reminder, sent on the membership end date ·
+3. Announcement · 4. Password reset.
