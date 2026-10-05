@@ -6,7 +6,8 @@ const env = require('./config/env');
 const { connectDB } = require('./config/db');
 const routes = require('./routes');
 const { notFound, errorHandler } = require('./middleware/error.middleware');
-const { TIME } = require('./constants');
+const { sendSuccess } = require('./utils/apiResponse');
+const { MESSAGES, TIME } = require('./constants');
 
 const app = express();
 
@@ -27,6 +28,10 @@ app.use(async (_req, _res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+app.get('/', (_req, res) => {
+  sendSuccess(res, { message: MESSAGES.HEALTH_OK, data: { status: 'ok' } });
 });
 
 app.use('/api', routes);
