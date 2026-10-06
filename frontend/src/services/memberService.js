@@ -15,7 +15,7 @@ export function createMember(payload) {
 }
 
 export function updateMember(id, payload) {
-  return apiClient(`${API.MEMBERS}/${id}`, { method: 'PATCH', body: payload });
+  return apiClient(`${API.MEMBERS}/${id}`, { method: 'POST', body: payload });
 }
 
 export function deleteMember(id) {

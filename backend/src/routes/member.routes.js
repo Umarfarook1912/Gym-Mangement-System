@@ -13,6 +13,7 @@ router.get('/', memberController.getMembers);
 router.post('/', validate(memberSchema), memberController.createMember);
 router.get('/:id', memberController.getMember);
 router.patch('/:id', validate(memberSchema), memberController.updateMember);
+router.post('/:id', validate(memberSchema), memberController.updateMember);
 router.post('/:id/payments', validate(paymentSchema), memberController.recordPayment);
 router.delete('/:id', memberController.deleteMember);
 router.get('/:id/attendance', memberController.getMemberAttendance);
