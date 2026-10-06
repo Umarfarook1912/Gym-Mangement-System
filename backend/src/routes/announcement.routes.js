@@ -12,6 +12,7 @@ router.use(authenticate, authorize(USER_ROLES.ADMIN));
 router.get('/', announcementController.getAnnouncements);
 router.post('/', validate(announcementSchema), announcementController.createAnnouncement);
 router.patch('/:id', validate(announcementSchema), announcementController.updateAnnouncement);
+router.post('/:id', validate(announcementSchema), announcementController.updateAnnouncement);
 router.delete('/:id', announcementController.deleteAnnouncement);
 
 module.exports = router;

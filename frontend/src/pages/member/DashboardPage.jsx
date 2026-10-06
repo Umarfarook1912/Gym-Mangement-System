@@ -1,3 +1,4 @@
+import AnnouncementDetails, { announcementHeading } from '../../components/cards/AnnouncementDetails';
 import Card from '../../components/cards/Card';
 import GymHours from '../../components/cards/GymHours';
 import StatCard from '../../components/cards/StatCard';
@@ -55,10 +56,10 @@ export default function MemberDashboardPage() {
               data.announcements.map((item) => (
                 <li key={item._id}>
                   <div className="mb-1 flex items-center justify-between gap-2">
-                    <p className="font-medium">{item.title}</p>
+                    <p className="font-medium">{announcementHeading(item)}</p>
                     <StatusBadge status={item.type} />
                   </div>
-                  <p className="text-sm text-muted">{item.body}</p>
+                  <AnnouncementDetails item={item} />
                 </li>
               ))
             ) : (

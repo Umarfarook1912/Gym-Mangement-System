@@ -92,7 +92,10 @@ async function getMemberDashboard(userId) {
   const member = await getMemberSelf(userId);
   const [recentAttendance, announcements, monthAttendance] = await Promise.all([
     Attendance.find({ member: userId }).sort({ dateKey: -1 }).limit(TIME.RECENT_ITEMS),
-    Announcement.find().sort({ createdAt: -1 }).limit(TIME.RECENT_ITEMS).select('title body type createdAt'),
+    Announcement.find()
+      .sort({ createdAt: -1 })
+      .limit(TIME.RECENT_ITEMS)
+      .select('title body type openTime closeTime effectiveDate startDate endDate createdAt'),
     getMonthAttendance(userId),
   ]);
 

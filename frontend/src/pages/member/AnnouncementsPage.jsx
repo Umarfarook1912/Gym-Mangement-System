@@ -1,3 +1,4 @@
+import AnnouncementDetails, { announcementHeading } from '../../components/cards/AnnouncementDetails';
 import Card from '../../components/cards/Card';
 import ErrorState from '../../components/common/ErrorState';
 import LoadingState from '../../components/common/LoadingState';
@@ -25,10 +26,10 @@ export default function MemberAnnouncementsPage() {
           {data.items.map((item) => (
             <Card key={item._id}>
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-lg font-semibold">{item.title}</h2>
+                <h2 className="text-lg font-semibold">{announcementHeading(item)}</h2>
                 <StatusBadge status={item.type} />
               </div>
-              <p className="text-sm text-muted">{item.body}</p>
+              <AnnouncementDetails item={item} />
               <p className="mt-3 text-xs text-muted">{formatDate(item.createdAt)}</p>
             </Card>
           ))}

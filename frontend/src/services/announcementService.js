@@ -11,7 +11,7 @@ export function createAnnouncement(payload) {
 }
 
 export function updateAnnouncement(id, payload) {
-  return apiClient(`${API.ANNOUNCEMENTS}/${id}`, { method: 'PATCH', body: payload });
+  return apiClient(`${API.ANNOUNCEMENTS}/${id}`, { method: 'POST', body: payload });
 }
 
 export function deleteAnnouncement(id) {

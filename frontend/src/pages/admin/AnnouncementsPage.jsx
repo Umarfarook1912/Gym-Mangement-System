@@ -6,7 +6,8 @@ import Dropdown from '../../components/common/Dropdown';
 import ConfirmationModal from '../../components/modals/ConfirmationModal';
 import Modal from '../../components/modals/Modal';
 import DataTable from '../../components/tables/DataTable';
-import AnnouncementForm, { emptyAnnouncement } from '../../components/forms/AnnouncementForm';
+import { announcementHeading } from '../../components/cards/AnnouncementDetails';
+import AnnouncementForm, { emptyAnnouncement, toAnnouncementFormValues } from '../../components/forms/AnnouncementForm';
 import { PAGINATION } from '../../constants';
 import { useToast } from '../../context/ToastContext';
 import { useFetch } from '../../hooks/useFetch';
@@ -88,7 +89,7 @@ export default function AnnouncementsPage() {
           emptyTitle="No announcements"
           pagination={{ page, totalPages: data?.pagination?.totalPages || PAGINATION.DEFAULT_PAGE, onPageChange: setPage }}
           columns={[
-            { key: 'title', label: 'Title' },
+            { key: 'title', label: 'Announcement', render: (row) => announcementHeading(row) },
             { key: 'type', label: 'Type', render: (row) => <StatusBadge status={row.type} /> },
             { key: 'createdAt', label: 'Published', render: (row) => formatDate(row.createdAt) },
             { key: 'sendEmail', label: 'Email', render: (row) => (row.sendEmail ? 'Sent' : 'No') },
@@ -101,7 +102,7 @@ export default function AnnouncementsPage() {
                     {
                       label: 'Edit',
                       onClick: () => {
-                        form.reset({ type: row.type, title: row.title, body: row.body, sendEmail: row.sendEmail });
+                        form.reset(toAnnouncementFormValues(row));
                         editor.openModal(row);
                       },
                     },

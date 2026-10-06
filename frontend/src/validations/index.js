@@ -1,3 +1,4 @@
+import { ANNOUNCEMENT_TYPES } from '../constants';
 import { LIMITS } from './limits';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,9 +66,29 @@ export function validatePlan(values) {
 
 export function validateAnnouncement(values) {
   const errors = {};
+  const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
   if (!values.type) errors.type = 'Select a type';
+  if (values.type === ANNOUNCEMENT_TYPES.TIMING) {
+    if (!timePattern.test(values.openTime || '')) errors.openTime = 'Select an opening time';
+    if (!timePattern.test(values.closeTime || '')) errors.closeTime = 'Select a closing time';
+    if (!errors.openTime && !errors.closeTime && values.closeTime <= values.openTime) {
+      errors.closeTime = 'Closing time must be after opening time';
+    }
+    if (!datePattern.test(values.effectiveDate || '')) errors.effectiveDate = 'Select the date these hours start';
+    return errors;
+  }
+  if (values.type === ANNOUNCEMENT_TYPES.MAINTENANCE) {
+    if (!datePattern.test(values.startDate || '')) errors.startDate = 'Select a start date';
+    if (!datePattern.test(values.endDate || '')) errors.endDate = 'Select an end date';
+    if (!errors.startDate && !errors.endDate && values.endDate < values.startDate) {
+      errors.endDate = 'End date must be on or after the start date';
+    }
+    if (!values.body?.trim()) errors.body = 'Enter the announcement details';
+    return errors;
+  }
   if (!values.title?.trim()) errors.title = 'Enter a title';
-  if (!values.body?.trim()) errors.body = 'Enter the announcement';
+  if (!values.body?.trim()) errors.body = 'Enter the announcement details';
   return errors;
 }
 

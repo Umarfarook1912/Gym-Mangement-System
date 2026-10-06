@@ -16,10 +16,15 @@ const announcementSchema = new mongoose.Schema(
     },
     body: {
       type: String,
-      required: true,
       trim: true,
+      default: '',
       maxlength: LIMITS.BODY_MAX,
     },
+    openTime: { type: String, trim: true, default: '' },
+    closeTime: { type: String, trim: true, default: '' },
+    effectiveDate: { type: String, trim: true, default: '' },
+    startDate: { type: String, trim: true, default: '' },
+    endDate: { type: String, trim: true, default: '' },
     sendEmail: { type: Boolean, default: false },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

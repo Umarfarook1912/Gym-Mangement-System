@@ -114,16 +114,21 @@ function expiryTemplate({ fullName, endDate, planName, gymName }) {
   });
 }
 
-function announcementTemplate({ title, body, type, gymName }) {
+function announcementTemplate({ title, body, type, gymName, openTime, closeTime, effectiveDate, startDate, endDate }) {
+  const rows = [{ label: 'Type', value: TYPE_LABELS[type] || 'Announcement' }];
+  if (type === ANNOUNCEMENT_TYPES.TIMING) {
+    rows.push({ label: 'Opens', value: openTime }, { label: 'Closes', value: closeTime }, { label: 'Effective', value: effectiveDate });
+  } else if (type === ANNOUNCEMENT_TYPES.MAINTENANCE) {
+    rows.push({ label: 'Starts', value: startDate }, { label: 'Ends', value: endDate });
+  } else {
+    rows.push({ label: 'Title', value: title });
+  }
   return layout({
     gymName,
     title: 'Gym announcement',
     intro: 'A new update has been posted for members.',
-    rows: [
-      { label: 'Type', value: TYPE_LABELS[type] || 'Announcement' },
-      { label: 'Title', value: title },
-    ],
-    extra: escapeHtml(body).replace(/\n/g, '<br />'),
+    rows,
+    extra: body ? escapeHtml(body).replace(/\n/g, '<br />') : '',
   });
 }
 
